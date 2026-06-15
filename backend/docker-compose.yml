@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: kgp-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: kgp-postgres
+    environment:
+      POSTGRES_USER: kgp_user
+      POSTGRES_PASSWORD: kgp_password
+      POSTGRES_DB: kgp_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

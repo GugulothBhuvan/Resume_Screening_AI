@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+langchain
+langgraph
+langchain-google-genai
+pydantic
+python-multipart
+pdfplumber
+sqlalchemy
+python-dotenv
+pydantic-settings
+celery
+redis
+chromadb
+tiktoken
+sentence-transformers
+psycopg2-binary

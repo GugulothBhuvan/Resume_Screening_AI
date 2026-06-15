@@ -1,0 +1,78 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: kgp-postgres
+    environment:
+      POSTGRES_USER: kgp_user
+      POSTGRES_PASSWORD: kgp_password
+      POSTGRES_DB: kgp_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: kgp-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kgp-backend
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      DATABASE_URL: postgresql+psycopg2://kgp_user:kgp_password@postgres:5432/kgp_ai
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CHROMA_DB_DIR: /app/chroma_db
+      BACKEND_CORS_ORIGINS: '*'
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/temp:/app/temp
+      - ./backend/chroma_db:/app/chroma_db
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kgp-worker
+    command: celery -A app.core.celery_app worker --loglevel=info
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      DATABASE_URL: postgresql+psycopg2://kgp_user:kgp_password@postgres:5432/kgp_ai
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CHROMA_DB_DIR: /app/chroma_db
+      BACKEND_CORS_ORIGINS: '*'
+    depends_on:
+      - backend
+      - redis
+      - postgres
+    volumes:
+      - ./backend/chroma_db:/app/chroma_db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://backend:8000
+    container_name: kgp-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8000
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
