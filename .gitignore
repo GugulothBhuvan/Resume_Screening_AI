@@ -1,0 +1,67 @@
+# Root gitignore for full-stack project
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+*.db
+.venv/
+venv/
+ENV/
+env/
+
+# Python packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+.python-version
+
+# Docker
+docker-compose.override.yml
+Dockerfile*
+
+# Node
+node_modules/
+/npm-debug.log*
+**/node_modules/
+
+# Next.js
+.next/
+out/
+
+# Production
+build/
+
+# IDEs
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.idea/
+
+# OS generated files
+Thumbs.db
+
+# Frontend and backend temp files
+frontend/.next/
+frontend/out/
+backend/temp/
+backend/__pycache__/
+backend/*.py[cod]
